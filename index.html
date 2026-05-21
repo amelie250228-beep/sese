@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💩 똥 피하기 게임 💩</title>
+
+<style>
+
+body{
+    margin:0;
+    background:#222;
+    overflow:hidden;
+    font-family:sans-serif;
+    text-align:center;
+    color:white;
+}
+
+h1{
+    margin-top:15px;
+}
+
+#game{
+    width:400px;
+    height:600px;
+    background:linear-gradient(skyblue, white);
+    margin:20px auto;
+    position:relative;
+    overflow:hidden;
+    border:5px solid black;
+    border-radius:15px;
+}
+
+#player{
+    position:absolute;
+    bottom:10px;
+    left:175px;
+    font-size:45px;
+    transition:0.05s;
+}
+
+.poop{
+    position:absolute;
+    font-size:35px;
+}
+
+#score{
+    font-size:30px;
+    margin-top:10px;
+}
+
+#startText{
+    position:absolute;
+    width:100%;
+    top:250px;
+    font-size:30px;
+    font-weight:bold;
+    color:black;
+}
+
+</style>
+</head>
+<body>
+
+<h1>💩 똥 피하기 게임 💩</h1>
+
+<div id="game">
+
+    <div id="player">😺</div>
+
+    <div id="startText">
+        방향키로 움직이기<br>
+        ENTER 누르면 시작!
+    </div>
+
+</div>
+
+<div id="score">점수 : 0</div>
+
+<script>
+
+const game = document.getElementById("game");
+const player = document.getElementById("player");
+const scoreText = document.getElementById("score");
+const startText = document.getElementById("startText");
+
+let playerX = 175;
+let score = 0;
+let gameStarted = false;
+let gameOver = false;
+
+// 플레이어 이동
+document.addEventListener("keydown", (e)=>{
+
+    if(e.key === "Enter" && !gameStarted){
+
+        gameStarted = true;
+        startText.style.display = "none";
+
+        startGame();
+    }
+
+    if(gameOver) return;
+
+    if(e.key === "ArrowLeft"){
+        playerX -= 30;
+    }
+
+    if(e.key === "ArrowRight"){
+        playerX += 30;
+    }
+
+    // 벽 제한
+    if(playerX < 0) playerX = 0;
+    if(playerX > 350) playerX = 350;
+
+    player.style.left = playerX + "px";
+
+});
+
+// 똥 생성
+function createPoop(){
+
+    const poop = document.createElement("div");
+
+    poop.classList.add("poop");
+
+    poop.innerText = "💩";
+
+    let poopX = Math.random() * 360;
+    let poopY = -50;
+
+    let speed = 3 + Math.random() * 4 + score * 0.1;
+
+    poop.style.left = poopX + "px";
+    poop.style.top = poopY + "px";
+
+    game.appendChild(poop);
+
+    const fall = setInterval(()=>{
+
+        if(gameOver){
+
+            clearInterval(fall);
+            return;
+        }
+
+        poopY += speed;
+
+        poop.style.top = poopY + "px";
+
+        // 충돌 판정
+        if(
+            poopY > 520 &&
+            poopX > playerX - 20 &&
+            poopX < playerX + 40
+        ){
+
+            gameOver = true;
+
+            alert("💀 게임 오버!\n점수 : " + score);
+
+            location.reload();
+        }
+
+        // 바닥 도착
+        if(poopY > 650){
+
+            clearInterval(fall);
+
+            poop.remove();
+
+            score++;
+
+            scoreText.innerText = "점수 : " + score;
+        }
+
+    },20);
+
+}
+
+// 게임 시작
+function startGame(){
+
+    setInterval(()=>{
+
+        if(!gameOver){
+
+            createPoop();
+        }
+
+    },700);
+
+}
+
+</script>
+
+</body>
+</html>
